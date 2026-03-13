@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { RouterLink, useRouter } from 'vue-router'
-import { computed, h } from 'vue'
-import { message } from 'ant-design-vue'
-import { UserOutlined } from '@ant-design/icons-vue'
-import { useUserStore } from '@/stores/user'
-import { userLogout } from '@/api/userController'
+import {RouterLink, useRouter} from 'vue-router'
+import {computed, h} from 'vue'
+import {message} from 'ant-design-vue'
+import {LogoutOutlined, SettingOutlined, UserOutlined} from '@ant-design/icons-vue'
+import {useUserStore} from '@/stores/user'
+import {userLogout} from '@/api/userController'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -76,7 +76,17 @@ const handleLogout = async () => {
           </div>
           <template #overlay>
             <a-menu>
-              <a-menu-item key="logout" @click="handleLogout">退出登录</a-menu-item>
+              <a-menu-item key="profile" @click="router.push('/user/profile')">
+                <span class="dropdown-item">
+                  <SettingOutlined class="dropdown-icon" />个人中心
+                </span>
+              </a-menu-item>
+              <a-menu-divider />
+              <a-menu-item key="logout" @click="handleLogout">
+                <span class="dropdown-item dropdown-item--danger">
+                  <LogoutOutlined class="dropdown-icon" />退出登录
+                </span>
+              </a-menu-item>
             </a-menu>
           </template>
         </a-dropdown>
@@ -155,6 +165,21 @@ const handleLogout = async () => {
 
 .user-info:hover {
   background: #f5f5f5;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 110px;
+}
+
+.dropdown-item--danger {
+  color: #ff4d4f;
+}
+
+.dropdown-icon {
+  font-size: 14px;
 }
 
 .username {

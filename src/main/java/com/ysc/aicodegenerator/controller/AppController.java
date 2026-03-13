@@ -15,23 +15,22 @@ import com.ysc.aicodegenerator.exception.BusinessException;
 import com.ysc.aicodegenerator.exception.ErrorCode;
 import com.ysc.aicodegenerator.exception.ThrowUtils;
 import com.ysc.aicodegenerator.model.dto.app.*;
+import com.ysc.aicodegenerator.model.entity.App;
 import com.ysc.aicodegenerator.model.entity.User;
-import com.ysc.aicodegenerator.model.enums.CodeGenTypeEnum;
 import com.ysc.aicodegenerator.model.vo.AppVO;
 import com.ysc.aicodegenerator.ratelimit.annotation.RateLimit;
 import com.ysc.aicodegenerator.ratelimit.enums.RateLimitType;
+import com.ysc.aicodegenerator.service.AppService;
 import com.ysc.aicodegenerator.service.ProjectDownloadService;
 import com.ysc.aicodegenerator.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.ysc.aicodegenerator.model.entity.App;
-import com.ysc.aicodegenerator.service.AppService;
 import reactor.core.publisher.Flux;
 
 import java.io.File;
@@ -181,7 +180,7 @@ public class AppController {
     @PostMapping("/good/list/page/vo")
     @Cacheable(
             value = "good_app_page",
-            key = "T(com.ysc.aicodegenerator.utils.CacheKeyUtils).generateKey(#appQueryRequest)",
+            key = "T(com.ysc.aicodegenerator.utils.CacheKeyUtils).generteKey(#appQueryRequest)",
             condition = "#appQueryRequest.pageNum <= 10"
     )
     public BaseResponse<Page<AppVO>> listGoodAppVOByPage(@RequestBody AppQueryRequest appQueryRequest) {

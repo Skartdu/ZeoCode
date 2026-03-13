@@ -11,7 +11,7 @@ spring:
   session:
     timeout: 604800
     redis:
-      namespace: spring:session
+      namespace: spring:session:zeocode
   profiles:
     active: local
   application:

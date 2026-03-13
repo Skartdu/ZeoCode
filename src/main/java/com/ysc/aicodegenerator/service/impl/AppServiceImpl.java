@@ -15,10 +15,10 @@ import com.ysc.aicodegenerator.core.handler.StreamHandlerExecutor;
 import com.ysc.aicodegenerator.exception.BusinessException;
 import com.ysc.aicodegenerator.exception.ErrorCode;
 import com.ysc.aicodegenerator.exception.ThrowUtils;
+import com.ysc.aicodegenerator.mapper.AppMapper;
 import com.ysc.aicodegenerator.model.dto.app.AppAddRequest;
 import com.ysc.aicodegenerator.model.dto.app.AppQueryRequest;
 import com.ysc.aicodegenerator.model.entity.App;
-import com.ysc.aicodegenerator.mapper.AppMapper;
 import com.ysc.aicodegenerator.model.entity.User;
 import com.ysc.aicodegenerator.model.enums.ChatHistoryMessageTypeEnum;
 import com.ysc.aicodegenerator.model.enums.CodeGenTypeEnum;
@@ -31,6 +31,7 @@ import com.ysc.aicodegenerator.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -72,6 +73,9 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App>  implements AppS
 
     @Resource
     private AiCodeGenTypeRoutingService aiCodeGenTypeRoutingService;
+
+    @Value("${code.deploy-host:http://localhost}")
+    private String deployHost;
 
     @Override
     public AppVO getAppVO(App app){
@@ -235,7 +239,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App>  implements AppS
         boolean updateResult = this.updateById(updateApp);
         ThrowUtils.throwIf(!updateResult, ErrorCode.OPERATION_ERROR, "更新应用部署信息失败");
         // 10. 返回可访问的 URL
-        String deployUrl = String.format("%s/%s/", AppConstant.CODE_DEPLOY_HOST, deployKey);
+        String deployUrl = String.format("%s/%s/", deployHost, deployKey);
         // 11. 异步生成截图并更新应用封面
         generateAppScreenshotAsync(appId,deployUrl);
         return deployUrl;

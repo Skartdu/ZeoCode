@@ -1,16 +1,27 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
-import { SendOutlined, DeploymentUnitOutlined, RobotOutlined, UserOutlined, ReloadOutlined, InfoCircleOutlined, HistoryOutlined, DownloadOutlined, EditOutlined, CloseCircleOutlined } from '@ant-design/icons-vue'
-import { getAppVoById, deployApp, downloadAppCode } from '@/api/appController'
-import { getCodeGenTypeLabel, getCodeGenTypeColor } from '@/constants/codeGenType'
-import { injectEditor, clearEditorSelection, buildElementPrompt } from '@/utils/iframeEditor'
-import type { SelectedElementInfo } from '@/utils/iframeEditor'
-import { listAppChatHistory } from '@/api/chatHistoryController'
-import { useUserStore } from '@/stores/user'
-import { renderMarkdown } from '@/utils/markdown'
-import { getPreviewUrl, getDeployUrl } from '@/utils/env'
+import {computed, nextTick, onMounted, onUnmounted, reactive, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {message} from 'ant-design-vue'
+import {
+  CloseCircleOutlined,
+  DeploymentUnitOutlined,
+  DownloadOutlined,
+  EditOutlined,
+  HistoryOutlined,
+  InfoCircleOutlined,
+  ReloadOutlined,
+  RobotOutlined,
+  SendOutlined,
+  UserOutlined
+} from '@ant-design/icons-vue'
+import {deployApp, downloadAppCode, getAppVoById} from '@/api/appController'
+import {getCodeGenTypeColor, getCodeGenTypeLabel} from '@/constants/codeGenType'
+import type {SelectedElementInfo} from '@/utils/iframeEditor'
+import {buildElementPrompt, clearEditorSelection, injectEditor} from '@/utils/iframeEditor'
+import {listAppChatHistory} from '@/api/chatHistoryController'
+import {useUserStore} from '@/stores/user'
+import {renderMarkdown} from '@/utils/markdown'
+import {getDeployUrl, getPreviewUrl} from '@/utils/env'
 import 'highlight.js/styles/github.css'
 import AppDetailDrawer from '@/components/app/AppDetailDrawer.vue'
 
@@ -459,10 +470,26 @@ const detailVisible = ref(false)
             </template>
           </a-alert>
 
+          <!-- 工具栏 -->
+          <div class="input-toolbar">
+            <a-tooltip :title="!iframeVisible ? '网页生成后可使用可视化编辑' : ''">
+              <a-button
+                size="small"
+                :type="isEditMode ? 'primary' : 'text'"
+                :icon="isEditMode ? h(CloseCircleOutlined) : h(EditOutlined)"
+                :disabled="isGenerating || !iframeVisible"
+                :class="['toolbar-edit-btn', { 'toolbar-edit-btn--active': isEditMode }]"
+                @click="toggleEditMode"
+              >
+                {{ isEditMode ? '退出编辑' : '可视化编辑' }}
+              </a-button>
+            </a-tooltip>
+          </div>
+
           <a-textarea
             v-model:value="inputText"
             :rows="3"
-            :placeholder="isEditMode ? '点击网页元素选中后，描述修改需求（Ctrl+Enter 发送）' : '描述你想要的效果，可以一步步优化...（Ctrl+Enter 发送）'"
+            :placeholder="isEditMode ? '已选中元素，描述你的修改需求...' : '描述你想要的效果，可以一步步优化...'"
             :disabled="isGenerating"
             :bordered="false"
             class="chat-input"
@@ -471,17 +498,6 @@ const detailVisible = ref(false)
           <div class="input-bar">
             <span v-if="isGenerating" class="generating-tip">生成中...</span>
             <span v-else class="input-tip">Ctrl + Enter 发送</span>
-            <!-- 编辑模式切换按钮 -->
-            <a-tooltip :title="isEditMode ? '退出编辑模式' : '进入可视化编辑模式'">
-              <a-button
-                :type="isEditMode ? 'primary' : 'default'"
-                shape="circle"
-                :icon="isEditMode ? h(CloseCircleOutlined) : h(EditOutlined)"
-                :disabled="isGenerating || !iframeVisible"
-                class="edit-mode-btn"
-                @click="toggleEditMode"
-              />
-            </a-tooltip>
             <a-button
               type="primary"
               shape="circle"
@@ -745,8 +761,34 @@ export default { setup() { return { h } } }
   font-weight: 600;
 }
 
-.edit-mode-btn {
-  margin-right: 4px;
+.input-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 4px 2px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 2px;
+}
+
+.toolbar-edit-btn {
+  font-size: 12px;
+  color: #64748b;
+  border-radius: 6px;
+  padding: 0 8px;
+  height: 26px;
+  transition: all 0.2s;
+}
+
+.toolbar-edit-btn:not(:disabled):hover {
+  color: #7c3aed;
+  background: #f3f0ff;
+}
+
+.toolbar-edit-btn--active {
+  background: linear-gradient(135deg, #6d28d9, #7c3aed) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
 }
 
 /* 编辑模式下 iframe 鼠标变为十字 */
